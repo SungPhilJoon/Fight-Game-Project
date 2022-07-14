@@ -6,6 +6,6 @@ namespace Feeljoon.FightingGame
 {
     public interface IDamageable
     {
-        void TakeDamage(int damage);
+        void TakeDamage(int damage, Transform hitTransform = null);
     }
 }

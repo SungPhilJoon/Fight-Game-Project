@@ -8,21 +8,34 @@ namespace Feeljoon.FightingGame
     {
         #region Variables
         public Vector3 boxSize;
+        private PlayerCharacterController playerController;
+
+        public Collider[] targetColliders;
 
         #endregion Variables
 
         #region Unity Methods
-        void OnDrawGizmos()
+        void Awake()
         {
-            
+            playerController = GetComponentInParent<PlayerCharacterController>();
         }
 
-        #endregion Unity Methods
+#if UNITY_EDITOR
+        void OnDrawGizmos()
+        {
+            Gizmos.matrix = transform.localToWorldMatrix;
+            Gizmos.color = Color.blue;
+            Gizmos.DrawWireCube(Vector3.zero, boxSize);
+        }
+
+#endif
+
+#endregion Unity Methods
 
         #region Helper Methods
         public void CheckCollision()
         {
-            //Collider[] opponentCollider = Physics.OverlapBox()
+            targetColliders = Physics.OverlapBox(transform.position, boxSize * 0.5f, transform.rotation, playerController.targetMask);
         }
 
         #endregion Helper Methods

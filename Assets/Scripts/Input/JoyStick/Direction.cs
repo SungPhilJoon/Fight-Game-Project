@@ -7,5 +7,9 @@ namespace Feeljoon.FightingGame
         Left,
         Up,
         Down,
+        RightUp,
+        LeftUp,
+        RightDown,
+        LeftDown,
     }
 }

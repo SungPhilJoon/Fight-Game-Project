@@ -7,13 +7,20 @@ namespace Feeljoon.FightingGame
 {
     public class PlayerCharacterController : MonoBehaviour, IDamageable, ICommandable
     {
+        #region Event
+        public event EventHandler DeadEvent;
+
+        #endregion Event
+
         #region Variables
         protected PlayerCharacterController opponentPlayerController;
-        protected VirtualJoyStick virtualJoyStick;
+        [SerializeField] protected VirtualJoyStick virtualJoyStick;
+        private StateMachine<PlayerCharacterController> stateMachine;
         private Animator animator;
         private Rigidbody rigid;
 
         private int health = 200;
+        private int playerMask;
 
         protected Direction inputDirection;
 
@@ -21,8 +28,16 @@ namespace Feeljoon.FightingGame
         public float speed = 2.0f;
         [Header("캐릭터 점프 높이")]
         public float jumpHeightAmount = 2.0f;
+        [Header("Hit Effect")]
+        [SerializeField] private GameObject hitEffect;
         [Header("Ground Mask")]
         [SerializeField] private LayerMask groundMask;
+        [Header("Target Mask")]
+        public LayerMask targetMask;
+        [Header("Upper Manual Collision")]
+        public ManualCollision upperManualCollision;
+        [Header("Lower Manual Collision")]
+        public ManualCollision lowerManualCollision;
 
         #endregion Variables
 
@@ -54,6 +69,8 @@ namespace Feeljoon.FightingGame
             get => health;
         }
 
+        public StateMachine<PlayerCharacterController> StateMachine => stateMachine;
+
         #endregion Properties
 
         #region Unity Methods
@@ -70,14 +87,37 @@ namespace Feeljoon.FightingGame
                 opponentPlayerController = character;
             }
 
-            virtualJoyStick = FindObjectOfType<VirtualJoyStick>();
             animator = GetComponentInChildren<Animator>();
             rigid = GetComponent<Rigidbody>();
+
+            upperManualCollision = this.transform.GetChild(transform.childCount - 2).GetComponent<ManualCollision>();
+            lowerManualCollision = this.transform.GetChild(transform.childCount - 1).GetComponent<ManualCollision>();
+
+            stateMachine = new StateMachine<PlayerCharacterController>(this, new IdleState());
+            stateMachine.AddState(new MoveState());
+            stateMachine.AddState(new AttackState());
+            stateMachine.AddState(new DeadState());
+        }
+
+        protected virtual void Start()
+        {
+            playerMask = this.gameObject.layer;
+
+            if (playerMask.Equals(LayerMask.NameToLayer("1P")))
+            {
+                targetMask = 1 << LayerMask.NameToLayer("2P");
+            }
+            else if (playerMask.Equals(LayerMask.NameToLayer("2P")))
+            {
+                targetMask = 1 << LayerMask.NameToLayer("1P");
+            }
         }
 
         protected virtual void Update()
         {
             MoveCharacter();
+
+            stateMachine.Update(Time.deltaTime);
         }
 
         #endregion Unity Methods
@@ -85,6 +125,11 @@ namespace Feeljoon.FightingGame
         #region Helper Methods
         private void MoveCharacter()
         {
+            if (virtualJoyStick == null)
+            {
+                return;
+            }
+
             if (CommandManager.Instance.isInputButton)
             {
                 return;
@@ -92,7 +137,7 @@ namespace Feeljoon.FightingGame
 
             // Func<float, float> f = x => -4 * x + 3.2f; 
 
-            inputDirection = virtualJoyStick.CalcLeverDirection();
+            inputDirection = virtualJoyStick.CalcDirection();
 
             animator.SetFloat(hashMagnitude, virtualJoyStick.InputDirection.magnitude);
 
@@ -113,7 +158,7 @@ namespace Feeljoon.FightingGame
                 animator.SetFloat(hashHorizontal, virtualJoyStick.InputDirection.x);
                 animator.SetFloat(hashVertical, virtualJoyStick.InputDirection.y);
             }
-            else if (inputDirection.Equals(Direction.Up))
+            else if (inputDirection.Equals(Direction.Up) || inputDirection.Equals(Direction.RightUp) || inputDirection.Equals(Direction.LeftUp))
             {
                 if (!PlayerIsGround())
                 {
@@ -135,8 +180,10 @@ namespace Feeljoon.FightingGame
                     rigid.AddForce(jumpDirection * jumpHeightAmount, ForceMode.Impulse);
                 }
             }
-            else if (inputDirection.Equals(Direction.Down))
+            else if (inputDirection.Equals(Direction.Down) || inputDirection.Equals(Direction.RightDown) || inputDirection.Equals(Direction.LeftDown))
             {
+                transform.position += Vector3.forward * speed * Time.deltaTime * virtualJoyStick.InputDirection.x;
+
                 animator.SetFloat(hashHorizontal, virtualJoyStick.InputDirection.x);
                 animator.SetFloat(hashVertical, virtualJoyStick.InputDirection.y);
             }
@@ -155,19 +202,26 @@ namespace Feeljoon.FightingGame
         #endregion Helper Methods
 
         #region IDamageable
-        public void TakeDamage(int damage)
+        public void TakeDamage(int damage, Transform hitTransform = null)
         {
             health -= damage;
 
-            if (health <= 0)
+            if (hitTransform != null)
             {
-                animator.applyRootMotion = true;
-                animator.SetTrigger(hashDeadTrigger);
-                return;
+                Instantiate(hitEffect, hitTransform.position, Quaternion.identity);
             }
 
-            animator.SetTrigger(hashHitTrigger);
-            animator.ResetTrigger(hashHitTrigger);
+            if (health <= 0)
+            {
+                stateMachine.ChangeState<DeadState>();
+                DeadEvent.Invoke(null, null);
+
+                return;
+            }
+            else
+            {
+                stateMachine.ChangeState<HitState>();
+            }
         }
 
         #endregion IDamageable
