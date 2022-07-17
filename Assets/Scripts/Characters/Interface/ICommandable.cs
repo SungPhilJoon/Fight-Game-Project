@@ -8,4 +8,7 @@ public interface ICommandable
     void RightPunch();
     void LeftKick();
     void RightKick();
+
+    void OnExecuteUpperAttack();
+    void OnExecuteLowerAttack();
 }

@@ -83,6 +83,7 @@ namespace Feeljoon.FightingGame
             var newType = typeof(R);
             if (currentState.GetType() == newType)
             {
+                currentState.OnEnter();
                 return currentState as R;
             }
 

@@ -35,21 +35,20 @@ namespace Feeljoon.FightingGame
         #region Unity Methods
         void Awake()
         {
-            if (commandButton.Equals(CommandButton.LeftPunch))
+            switch(commandButton)
             {
-                InputMethod = playerController.LeftPunch;
-            }
-            else if (commandButton.Equals(CommandButton.RightPunch))
-            {
-                InputMethod = playerController.RightPunch;
-            }
-            else if (commandButton.Equals(CommandButton.LeftKick))
-            {
-                InputMethod = playerController.LeftKick;
-            }
-            else if (commandButton.Equals(CommandButton.RightKick))
-            {
-                InputMethod = playerController.RightKick;
+                case CommandButton.LeftPunch:
+                    InputMethod = playerController.LeftPunch;
+                    break;
+                case CommandButton.RightPunch:
+                    InputMethod = playerController.RightPunch;
+                    break;
+                case CommandButton.LeftKick:
+                    InputMethod = playerController.LeftKick;
+                    break;
+                case CommandButton.RightKick:
+                    InputMethod = playerController.RightKick;
+                    break;
             }
         }
 
@@ -59,14 +58,11 @@ namespace Feeljoon.FightingGame
         public void InputCommand()
         {
             CommandManager.Instance.inputCommandList.Add(commandButton);
-            CommandManager.Instance.isInputButton = true;
 
             InputMethod.Invoke();
 
             playerController.StateMachine.ChangeState<AttackState>();
         }
-
-        
 
         #endregion Helper Methods
     }

@@ -20,6 +20,7 @@ namespace Feeljoon.FightingGame
         private Rigidbody rigid;
 
         private int health = 200;
+        private int damage;
         private int playerMask;
 
         protected Direction inputDirection;
@@ -69,6 +70,12 @@ namespace Feeljoon.FightingGame
             get => health;
         }
 
+        public int Damage
+        {
+            get => damage;
+            set => damage = value;
+        }
+
         public StateMachine<PlayerCharacterController> StateMachine => stateMachine;
 
         #endregion Properties
@@ -96,6 +103,7 @@ namespace Feeljoon.FightingGame
             stateMachine = new StateMachine<PlayerCharacterController>(this, new IdleState());
             stateMachine.AddState(new MoveState());
             stateMachine.AddState(new AttackState());
+            stateMachine.AddState(new HitState());
             stateMachine.AddState(new DeadState());
         }
 
@@ -229,22 +237,46 @@ namespace Feeljoon.FightingGame
         #region ICommandable
         public void LeftPunch()
         {
+            animator.ResetTrigger(hashLeftPunch);
             animator.SetTrigger(hashLeftPunch);
         }
 
         public void RightPunch()
         {
+            animator.ResetTrigger(hashRightPunch);
             animator.SetTrigger(hashRightPunch);
         }
 
         public void LeftKick()
         {
+            animator.ResetTrigger(hashLeftKick);
             animator.SetTrigger(hashLeftKick);
         }
 
         public void RightKick()
         {
+            animator.ResetTrigger(hashRightKick);
             animator.SetTrigger(hashRightKick);
+        }
+
+        public void OnExecuteUpperAttack()
+        {
+            upperManualCollision.CheckCollision();
+
+            if (upperManualCollision.targetColliders[0].TryGetComponent<IDamageable>(out IDamageable damageable))
+            {
+                damageable.TakeDamage(damage);
+            }
+        }
+
+        public void OnExecuteLowerAttack()
+        {
+            lowerManualCollision.CheckCollision();
+
+            if (lowerManualCollision.targetColliders[0].TryGetComponent<IDamageable>(out IDamageable damageable))
+            {
+                damageable.TakeDamage(damage);
+            }
         }
 
         #endregion ICommandable

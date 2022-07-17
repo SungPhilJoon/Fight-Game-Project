@@ -28,7 +28,10 @@ namespace Feeljoon.FightingGame
 
         public override void Update(float deltaTime)
         {
-
+            if (stateMachine.ElapsedTimeInState > 0.3f)
+            {
+                stateMachine.ChangeState<IdleState>();
+            }
         }
 
         public override void OnExit()

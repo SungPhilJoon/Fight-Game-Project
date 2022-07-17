@@ -6,18 +6,25 @@ namespace Feeljoon.FightingGame
 {
     public class AttackState : State<PlayerCharacterController>
     {
+        #region Variables
         private ManualCollision upperManualCollision;
         private ManualCollision lowerManualCollision;
+
+        private Animator animator;
+
+        #endregion Variables
 
         public override void OnInitialized()
         {
             upperManualCollision = context.upperManualCollision;
             lowerManualCollision = context.lowerManualCollision;
+
+            animator = context.GetComponentInChildren<Animator>();
         }
 
         public override void OnEnter()
         {
-            
+            CommandManager.Instance.isInputButton = true;
         }
 
         public override void Update(float deltaTime)

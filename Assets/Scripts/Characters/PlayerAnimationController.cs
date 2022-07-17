@@ -2,17 +2,34 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerAnimationController : MonoBehaviour
+namespace Feeljoon.FightingGame
 {
-    // Start is called before the first frame update
-    void Start()
+    public class PlayerAnimationController : MonoBehaviour
     {
-        
-    }
+        #region Variables
+        private PlayerCharacterController playerController;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        #endregion Variables
+
+        #region Unity Methods
+        void Awake()
+        {
+            playerController = GetComponentInParent<PlayerCharacterController>();
+        }
+
+        #endregion Unity Methods
+
+        #region Helper Methods
+        public void OnExecuteUpperAttack()
+        {
+            playerController.OnExecuteUpperAttack();
+        }
+
+        public void OnExecuteLowerAttack()
+        {
+            playerController.OnExecuteLowerAttack();
+        }
+
+        #endregion Helper Methods
     }
 }

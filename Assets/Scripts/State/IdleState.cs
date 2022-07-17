@@ -13,12 +13,12 @@ namespace Feeljoon.FightingGame
 
         public override void OnEnter()
         {
-
+            CommandManager.Instance.directionContain.Push(Direction.Middle);
         }
 
         public override void Update(float deltaTime)
         {
-
+            
         }
 
         public override void OnExit()
