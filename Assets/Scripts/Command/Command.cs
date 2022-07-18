@@ -8,6 +8,11 @@ namespace Feeljoon.FightingGame
     [Serializable]
     public class Command
     {
+        #region Delagate
+        public Action<Direction, float> knockbackAction; 
+
+        #endregion Delegate
+
         #region Variables
         public CommandButton command;
         public List<Direction> directions;
@@ -18,6 +23,8 @@ namespace Feeljoon.FightingGame
 
         public Direction knockbackDirection;
         public float knockbackForce;
+
+        public string commandName;
 
         private string upperAttackCollision = "Upper";
         private string lowerAttackCollision = "Lower";

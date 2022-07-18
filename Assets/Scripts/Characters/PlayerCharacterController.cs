@@ -8,12 +8,14 @@ namespace Feeljoon.FightingGame
     public class PlayerCharacterController : MonoBehaviour, IDamageable, ICommandable
     {
         #region Event
-        public event EventHandler DeadEvent;
+        public delegate void DeadEvent();
+
+        public event DeadEvent OnDeadEvent;
 
         #endregion Event
 
         #region Variables
-        protected PlayerCharacterController opponentPlayerController;
+        public PlayerCharacterController opponentPlayerController;
         [SerializeField] protected VirtualJoyStick virtualJoyStick;
         private StateMachine<PlayerCharacterController> stateMachine;
         private Animator animator;
@@ -222,7 +224,7 @@ namespace Feeljoon.FightingGame
             if (health <= 0)
             {
                 stateMachine.ChangeState<DeadState>();
-                DeadEvent.Invoke(null, null);
+                OnDeadEvent.Invoke();
 
                 return;
             }
@@ -262,6 +264,11 @@ namespace Feeljoon.FightingGame
         public void OnExecuteUpperAttack()
         {
             upperManualCollision.CheckCollision();
+
+            if (upperManualCollision.targetColliders.Length.Equals(0))
+            {
+                return;
+            }
 
             if (upperManualCollision.targetColliders[0].TryGetComponent<IDamageable>(out IDamageable damageable))
             {

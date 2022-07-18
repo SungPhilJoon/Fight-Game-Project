@@ -13,6 +13,8 @@ namespace Feeljoon.FightingGame
 
         private bool isEndRound = false;
 
+        public int roundNumber;
+
         #endregion Variables
 
         #region Properties
@@ -34,15 +36,20 @@ namespace Feeljoon.FightingGame
 
         void Start()
         {
-            player1.DeadEvent += EndRound;
+            player1.OnDeadEvent -= EndRound;
+            player1.OnDeadEvent += EndRound;
+            player2.OnDeadEvent -= EndRound;
+            player2.OnDeadEvent += EndRound;
         }
 
         #endregion Unity Methods
 
         #region Helper Methods
-        private void EndRound(object sender = null , EventArgs args = null)
+        private void EndRound()
         {
             isEndRound = true;
+
+            roundNumber++;
         }
 
         #endregion Helper Methods

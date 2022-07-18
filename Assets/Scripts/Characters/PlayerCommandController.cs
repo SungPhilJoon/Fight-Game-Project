@@ -8,11 +8,20 @@ namespace Feeljoon.FightingGame
     {
         #region Variables
         public CommandObject[] commandObjects;
+        private PlayerCharacterController playerController;
 
         #endregion Variables
 
         #region Unity Methods
+        void Awake()
+        {
+            playerController = GetComponent<PlayerCharacterController>();
 
+            foreach (CommandObject commandObject in commandObjects)
+            {
+                commandObject.opponentTransform = playerController.opponentPlayerController.transform;
+            }
+        }
 
         #endregion Unity Methods
 
