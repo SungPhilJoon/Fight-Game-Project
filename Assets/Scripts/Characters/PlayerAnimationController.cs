@@ -20,14 +20,24 @@ namespace Feeljoon.FightingGame
         #endregion Unity Methods
 
         #region Helper Methods
-        public void OnExecuteUpperAttack()
+        public void OnExecuteLeftPunchAttack()
         {
-            playerController.OnExecuteUpperAttack();
+            playerController.OnExecuteLeftPunchAttack();
         }
 
-        public void OnExecuteLowerAttack()
+        public void OnExecuteRightPunchAttack()
         {
-            playerController.OnExecuteLowerAttack();
+            playerController.OnExecuteRightPunchAttack();
+        }
+
+        public void OnExecuteLeftKickAttack()
+        {
+            playerController.OnExecuteLeftKickAttack();
+        }
+
+        public void OnExecuteRightKickAttack()
+        {
+            playerController.OnExecuteRightKickAttack();
         }
 
         #endregion Helper Methods

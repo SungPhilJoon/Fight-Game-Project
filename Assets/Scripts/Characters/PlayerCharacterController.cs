@@ -37,10 +37,12 @@ namespace Feeljoon.FightingGame
         [SerializeField] private LayerMask groundMask;
         [Header("Target Mask")]
         public LayerMask targetMask;
-        [Header("Upper Manual Collision")]
-        public ManualCollision upperManualCollision;
-        [Header("Lower Manual Collision")]
-        public ManualCollision lowerManualCollision;
+        [Header("Manual Collision")]
+        public ManualCollision leftPunchManualCollision;
+        public ManualCollision rightPunchManualCollision;
+        public ManualCollision leftKickManualCollision;
+        public ManualCollision rightKickManualCollision;
+
 
         #endregion Variables
 
@@ -98,9 +100,6 @@ namespace Feeljoon.FightingGame
 
             animator = GetComponentInChildren<Animator>();
             rigid = GetComponent<Rigidbody>();
-
-            upperManualCollision = this.transform.GetChild(transform.childCount - 2).GetComponent<ManualCollision>();
-            lowerManualCollision = this.transform.GetChild(transform.childCount - 1).GetComponent<ManualCollision>();
 
             stateMachine = new StateMachine<PlayerCharacterController>(this, new IdleState());
             stateMachine.AddState(new MoveState());
@@ -239,50 +238,107 @@ namespace Feeljoon.FightingGame
         #region ICommandable
         public void LeftPunch()
         {
-            animator.ResetTrigger(hashLeftPunch);
             animator.SetTrigger(hashLeftPunch);
+            animator.ResetTrigger(hashRightPunch);
+            animator.ResetTrigger(hashLeftKick);
+            animator.ResetTrigger(hashRightKick);
         }
 
         public void RightPunch()
         {
-            animator.ResetTrigger(hashRightPunch);
             animator.SetTrigger(hashRightPunch);
+            animator.ResetTrigger(hashLeftPunch);
+            animator.ResetTrigger(hashLeftKick);
+            animator.ResetTrigger(hashRightKick);
         }
 
         public void LeftKick()
         {
-            animator.ResetTrigger(hashLeftKick);
             animator.SetTrigger(hashLeftKick);
+            animator.ResetTrigger(hashLeftPunch);
+            animator.ResetTrigger(hashRightPunch);
+            animator.ResetTrigger(hashRightKick);
         }
 
         public void RightKick()
         {
-            animator.ResetTrigger(hashRightKick);
             animator.SetTrigger(hashRightKick);
+            animator.ResetTrigger(hashLeftPunch);
+            animator.ResetTrigger(hashRightPunch);
+            animator.ResetTrigger(hashLeftKick);
         }
 
-        public void OnExecuteUpperAttack()
+        public void OnExecuteLeftPunchAttack()
         {
-            upperManualCollision.CheckCollision();
+            leftPunchManualCollision.CheckCollision();
 
-            if (upperManualCollision.targetColliders.Length.Equals(0))
+            if (leftPunchManualCollision.targetColliders.Length == 0)
             {
                 return;
             }
 
-            if (upperManualCollision.targetColliders[0].TryGetComponent<IDamageable>(out IDamageable damageable))
+            if (leftPunchManualCollision.targetColliders[0].TryGetComponent<IDamageable>(out IDamageable damageable))
             {
                 damageable.TakeDamage(damage);
             }
         }
 
-        public void OnExecuteLowerAttack()
+        public void OnExecuteRightPunchAttack()
         {
-            lowerManualCollision.CheckCollision();
+            rightPunchManualCollision.CheckCollision();
 
-            if (lowerManualCollision.targetColliders[0].TryGetComponent<IDamageable>(out IDamageable damageable))
+            if (rightPunchManualCollision.targetColliders.Length == 0)
+            {
+                return;
+            }
+
+            if (rightPunchManualCollision.targetColliders[0].TryGetComponent<IDamageable>(out IDamageable damageable))
             {
                 damageable.TakeDamage(damage);
+            }
+        }
+
+        public void OnExecuteLeftKickAttack()
+        {
+            leftKickManualCollision.CheckCollision();
+
+            if (leftKickManualCollision.targetColliders.Length == 0)
+            {
+                return;
+            }
+
+            if (leftKickManualCollision.targetColliders[0].TryGetComponent<IDamageable>(out IDamageable damageable))
+            {
+                damageable.TakeDamage(damage);
+            }
+        }
+
+        public void OnExecuteRightKickAttack()
+        {
+            rightKickManualCollision.CheckCollision();
+
+            if (rightKickManualCollision.targetColliders.Length == 0)
+            {
+                return;
+            }
+
+            if (rightKickManualCollision.targetColliders[0].TryGetComponent<IDamageable>(out IDamageable damageable))
+            {
+                damageable.TakeDamage(damage);
+            }
+        }
+
+        public void CheckDirection()
+        {
+            Direction direction = virtualJoyStick.CalcDirection();
+
+            CommandManager.Instance.PushDirection(direction);
+
+            switch(direction)
+            {
+                case Direction.Middle:
+                    
+                    break;
             }
         }
 

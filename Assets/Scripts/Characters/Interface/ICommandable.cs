@@ -9,6 +9,8 @@ public interface ICommandable
     void LeftKick();
     void RightKick();
 
-    void OnExecuteUpperAttack();
-    void OnExecuteLowerAttack();
+    void OnExecuteLeftPunchAttack();
+    void OnExecuteRightPunchAttack();
+    void OnExecuteLeftKickAttack();
+    void OnExecuteRightKickAttack();
 }

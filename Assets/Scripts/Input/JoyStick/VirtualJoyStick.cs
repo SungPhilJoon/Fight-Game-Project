@@ -54,14 +54,17 @@ namespace Feeljoon.FightingGame
             if (x > 0.2f)
             {
                 direction = y > 0.2f ? Direction.RightUp : y < -0.2f ? Direction.RightDown : Direction.Right;
+                CommandManager.Instance.PushDirection(direction);
             }
             else if (x < -0.2f)
             {
                 direction = y > 0.2f ? Direction.LeftUp : y < -0.2f ? Direction.LeftDown : Direction.Left;
+                CommandManager.Instance.PushDirection(direction);
             }
             else
             {
                 direction = y > 0.2f ? Direction.Up : y < -0.2f ? Direction.Down : Direction.Middle;
+                CommandManager.Instance.PushDirection(direction);
             }
 
             return direction;
@@ -121,7 +124,7 @@ namespace Feeljoon.FightingGame
         {
             ControlJoyStickLever(eventData);
 
-            StartCoroutine(PushDirectionWithDelay(CommandManager.Instance.delayWithInputDirection));
+            // StartCoroutine(PushDirectionWithDelay(CommandManager.Instance.delayWithInputDirection));
         }
 
         public void OnEndDrag(PointerEventData eventData)
@@ -129,7 +132,7 @@ namespace Feeljoon.FightingGame
             lever.anchoredPosition = Vector2.zero;
             inputDirection = Vector2.zero;
 
-            CommandManager.Instance.PushDirection(Direction.Middle);
+            // CommandManager.Instance.PushDirection(Direction.Middle);
 
             isInput = false;
         }
